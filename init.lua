@@ -18,18 +18,21 @@ obj.homepage = "https://github.com/bviefhues/AppWindowSwitcher.spoon"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
 
--- Variables --------------------------------------------------------
-
 --- AppWindowSwitcher.logger
 --- Variable
 --- Logger object used within the Spoon. Can be accessed to set 
 --- the default log level for the messages coming from the Spoon.
 obj.log = hs.logger.new("AppWindowSwitcher")
 
+-- prefix match for text. Returns true if text starts with prefix.
 function obj.startswith(text, prefix)
     return text:find(prefix, 1, true) == 1
 end
 
+-- Matches window properties with matchtexts array of texts
+-- Returns true if:
+-- * windows application bundleID is an element of matchtexts, or
+-- * windows application title starts with an element of matchtext
 function obj.match(window, matchtexts)
     bundleID = window:application():bundleID()
     if hs.fnutils.contains(matchtexts, bundleID) then
@@ -54,22 +57,24 @@ end
 ---  * mapping - A table containing hotkey modifier/key details for each
 ---              application to manage, format per table element:
 ---
----              Either a single bundleID
----                 ["bundleID"] = {mods, key} 
+---              Either a single text to match
+---                 ["<matchtext>"] = {mods, key} 
 ---
----              Or a list of bundleIDs, to assign multiple applications 
+---              Or a list of texts, to assign multiple applications 
 ---              to one hotkey.
----                 [{"bundleID", "bundleID", ...}] = {mods, key}
+---                 [{"<matchtext>", "<matchtext>", ...}] = {mods, key}
 ---
+---              <matchtext> can be either a bundleID, or a text which 
+---              is matched against a windows application title start. 
 --- Returns:
----  * The TilingWindowManager object
+---  * The AppWindowSwitcher object
 function obj:bindHotkeys(mapping)
     for matchtexts, modsKey in pairs(mapping) do
         obj.log.d("Mapping " .. hs.inspect(matchtexts) .. 
                   " to " .. hs.inspect(modsKey))
 
         if type(matchtexts) == "string" then
-            matchtexts = {matchtexts}
+            matchtexts = {matchtexts} -- further code assumes a table
         end
         mods, key = table.unpack(modsKey)
         hs.hotkey.bind(mods, key, function() 

@@ -26,6 +26,26 @@ obj.license = "MIT - https://opensource.org/licenses/MIT"
 --- the default log level for the messages coming from the Spoon.
 obj.log = hs.logger.new("AppWindowSwitcher")
 
+function obj.startswith(text, prefix)
+    return text:find(prefix, 1, true) == 1
+end
+
+function obj.match(window, matchtexts)
+    bundleID = window:application():bundleID()
+    if hs.fnutils.contains(matchtexts, bundleID) then
+        obj.log.d("bundleID matches:", bundleID)
+        return true
+    end
+    title = window:application():title()
+    for _, matchtext in pairs(matchtexts) do
+        if obj.startswith(title, matchtext) then
+            obj.log.d("title matches:", title, matchtext)
+            return true
+        end
+    end
+    return false
+end
+
 --- AppWindowSwitcher:bindHotkeys(mapping) -> self
 --- Method
 --- Binds hotkeys for AppWindowSwitcher
@@ -44,12 +64,12 @@ obj.log = hs.logger.new("AppWindowSwitcher")
 --- Returns:
 ---  * The TilingWindowManager object
 function obj:bindHotkeys(mapping)
-    for bundleIDs, modsKey in pairs(mapping) do
-        obj.log.d("Mapping " .. hs.inspect(bundleIDs) .. 
+    for matchtexts, modsKey in pairs(mapping) do
+        obj.log.d("Mapping " .. hs.inspect(matchtexts) .. 
                   " to " .. hs.inspect(modsKey))
 
-        if type(bundleIDs) == "string" then
-            bundleIDs = {bundleIDs}
+        if type(matchtexts) == "string" then
+            matchtexts = {matchtexts}
         end
         mods, key = table.unpack(modsKey)
         hs.hotkey.bind(mods, key, function() 
@@ -57,25 +77,19 @@ function obj:bindHotkeys(mapping)
                 hs.window.focusedWindow():application():bundleID() 
 
             newW = nil
-            if hs.fnutils.contains(bundleIDs, focusedWindowBundleID) then
+            if obj.match(hs.window.focusedWindow(), matchtexts) then
                 -- app has focus, find last matching window
                 for _, w in pairs(hs.window.orderedWindows()) do
-                    if hs.fnutils.contains(
-                        bundleIDs,
-                        w:application():bundleID()
-                    ) then
-                        newW = w
+                    if obj.match(w, matchtexts) then
+                        newW = w -- remember last match
                     end
                 end
             else
                 -- app does not have focus, find first matching window
                 for _, w in pairs(hs.window.orderedWindows()) do
-                    if hs.fnutils.contains(
-                        bundleIDs, 
-                        w:application():bundleID()
-                    ) then
+                    if obj.match(w, matchtexts) then
                         newW = w
-                        break
+                        break -- break on first match
                     end
                 end
             end

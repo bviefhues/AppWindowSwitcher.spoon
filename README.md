@@ -1,7 +1,8 @@
 # AppWindowSwitcher
 ---
 
-Keyboard-driven Application Window Switcher.
+macOS application aware, keyboard-driven window switcher. Spoon 
+on top of Hammerspoon.
 
 Cycles (make window front and focused) all windows matching a 
 bundelID, a list of bundleID's, an application name matchtext, 

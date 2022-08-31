@@ -1,4 +1,4 @@
-# [docs](index.md) » AppWindowSwitcher
+# AppWindowSwitcher
 ---
 
 Keyboard-driven Application Window Switcher.

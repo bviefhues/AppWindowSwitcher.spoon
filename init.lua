@@ -1,6 +1,46 @@
---- === AppWindowSwitcher.spoon ===
+--- === AppWindowSwitcher ===
 ---
 --- Keyboard-driven Application Window Switcher.
+---
+--- Cycles (make window front and focused) all windows matching a 
+--- bundelID, a list of bundleID's, an application name matchtext, 
+--- or a list of application name matchtexts. Cycling applies to 
+--- visible windows of currently focused space only. The spoon does 
+--- not launch applications, it operates on open windows only
+---
+--- Example `~/.hammerspoon/init.lua` configuration:
+---
+--- ```
+--- hs.loadSpoon("AppWindowSwitcher")
+---     -- :setLogLevel("debug") -- uncomment for console debug log
+---     :bindHotkeys({
+---         ["com.apple.Terminal"]        = {hyper, "t"},
+---         [{"com.apple.Safari",
+---           "com.google.Chrome",
+---           "com.kagi.kagimacOS",
+---           "com.microsoft.edgemac", 
+---           "org.mozilla.firefox"}]     = {hyper, "q"},
+---         ["Hammerspoon"]               = {hyper, "h"},
+---         ["O", "o"]                    = {hyper, "o"},
+---     })
+--- ```
+--- In this example, 
+--- * `hyper-t` cycles all terminal windows (matching a single bundleID),
+--- * `hyper-q` cycles all windows of the four browsers (matching either 
+---   of the bundleIDs)
+--- * `hyper-h` brings the Hammerspoon console forward (matching the 
+---   application title),
+--- * `hyper-o` cycles all windows whose application title starts 
+---   with "O" or "o".
+---
+--- Windows maintain an order on the desktop, they are stacked. 
+--- The cycling logic works as follows:
+--- * If the focused window is part of the application matching a hotkey,
+---   then the last window (in terms of stacking) of the matching 
+---   application(s) will be brought forward and focused.
+--- * If the focused window is not part of the application matching a
+---   hotkey, then the first window of the matching applications will be
+---   brought forward and focused.
 
 require("hs.hotkey")
 require("hs.window")
@@ -18,10 +58,9 @@ obj.homepage = "https://github.com/bviefhues/AppWindowSwitcher.spoon"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
 
---- AppWindowSwitcher.logger
---- Variable
---- Logger object used within the Spoon. Can be accessed to set 
---- the default log level for the messages coming from the Spoon.
+-- AppWindowSwitcher.log
+-- Variable
+-- Logger object used within the Spoon. Can be accessed to set the default log level for the messages coming from the Spoon.
 obj.log = hs.logger.new("AppWindowSwitcher")
 
 -- prefix match for text. Returns true if text starts with prefix.
@@ -54,18 +93,16 @@ end
 --- Binds hotkeys for AppWindowSwitcher
 ---
 --- Parameters:
----  * mapping - A table containing hotkey modifier/key details for each
----              application to manage, format per table element:
+---  * mapping - A table containing hotkey modifier/key details for each application to manage 
 ---
----              Either a single text to match
----                 ["<matchtext>"] = {mods, key} 
+--- Notes:
+--- The mapping table accepts these formats per table element:
+--- * A single text to match:
+---   `["<matchtext>"] = {mods, key}` 
+--- * A list of texts, to assign multiple applications to one hotkey:
+---   `[{"<matchtext>", "<matchtext>", ...}] = {mods, key}`
+--- * `<matchtext>` can be either a bundleID, or a text which is substring matched against a windows application title start. 
 ---
----              Or a list of texts, to assign multiple applications 
----              to one hotkey.
----                 [{"<matchtext>", "<matchtext>", ...}] = {mods, key}
----
----              <matchtext> can be either a bundleID, or a text which 
----              is matched against a windows application title start. 
 --- Returns:
 ---  * The AppWindowSwitcher object
 function obj:bindHotkeys(mapping)
@@ -102,7 +139,7 @@ function obj:bindHotkeys(mapping)
                 newW:raise():focus()
             else
                 hs.alert.show("No window open for " .. 
-                    hs.inspect(bundleIDs))
+                    hs.inspect(matchtexts))
             end
         end)
     end
@@ -115,7 +152,7 @@ end
 --- Set the log level of the spoon logger.
 ---
 --- Parameters:
----  * Log level 
+---  * Log level - `"debug"` to enable console debug output
 ---
 --- Returns:
 ---  * The AppWindowSwitcher object

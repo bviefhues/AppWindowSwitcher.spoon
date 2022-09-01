@@ -1,7 +1,7 @@
 # AppWindowSwitcher
 ---
 
-macOS application aware, keyboard-driven window switcher. Spoon 
+macOS application aware, keyboard driven window switcher. Spoon 
 on top of Hammerspoon.
 
 Switches windows by focusing and raising them. All windows matching a 

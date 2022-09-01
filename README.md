@@ -4,11 +4,12 @@
 macOS application aware, keyboard-driven window switcher. Spoon 
 on top of Hammerspoon.
 
-Cycles (make window front and focused) all windows matching a 
+Cycles windows by focusing and raising them. All windows matching a 
 bundelID, a list of bundleID's, an application name matchtext, 
-or a list of application name matchtexts. Cycling applies to 
-visible windows of currently focused space only. The spoon does 
-not launch applications, it operates on open windows only
+or a list of application name matchtexts are cycled. Cycling applies 
+to visible windows of currently focused space only. The spoon does 
+not launch applications, it operates on open windows of running 
+applications.
 
 Example `~/.hammerspoon/init.lua` configuration:
 

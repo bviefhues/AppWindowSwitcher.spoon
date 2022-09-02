@@ -1,5 +1,4 @@
 # AppWindowSwitcher
----
 
 macOS application aware, keyboard driven window switcher. Spoon 
 on top of Hammerspoon.
@@ -47,8 +46,8 @@ The cycling logic works as follows:
 
 ## API Overview
 * Methods - API calls which can only be made on an object returned by a constructor
- * [bindHotkeys](#bindHotkeys)
- * [setLogLevel](#setLogLevel)
+  * [bindHotkeys](#bindHotkeys)
+  * [setLogLevel](#setLogLevel)
 
 ## API Documentation
 

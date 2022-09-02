@@ -23,7 +23,7 @@
 ---           "com.microsoft.edgemac", 
 ---           "org.mozilla.firefox"}]     = {hyper, "q"},
 ---         ["Hammerspoon"]               = {hyper, "h"},
----         ["O", "o"]                    = {hyper, "o"},
+---         [{"O", "o"}]                  = {hyper, "o"},
 ---     })
 --- ```
 --- In this example, 
